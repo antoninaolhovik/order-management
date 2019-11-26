@@ -1,10 +1,13 @@
 package com.amakedon.om.data.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Entity
+@Entity(name = "Product")
+@Table(name = "product")
 public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +21,11 @@ public class Product implements Serializable {
 
     @Column(nullable = false)
     private Double price;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonBackReference
+    private Category category;
 
     public long getId() {
         return id;
@@ -51,6 +59,14 @@ public class Product implements Serializable {
         this.price = price;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,13 +75,13 @@ public class Product implements Serializable {
         return id == product.id &&
                 Objects.equals(name, product.name) &&
                 Objects.equals(sku, product.sku) &&
-                Objects.equals(price, product.price);
+                Objects.equals(price, product.price) &&
+                Objects.equals(category, product.category);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, name, sku, price);
+        return Objects.hash(id, name, sku, price, category);
     }
 
     @Override
@@ -75,6 +91,7 @@ public class Product implements Serializable {
                 ", name='" + name + '\'' +
                 ", sku='" + sku + '\'' +
                 ", price=" + price +
+                ", categoryId=" + category.getId() +
                 '}';
     }
 }

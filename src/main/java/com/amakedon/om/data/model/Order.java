@@ -1,20 +1,24 @@
 package com.amakedon.om.data.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-@Entity
+@Entity(name = "Order1")
+@Table(name = "order1")
 public class Order implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private long id;
 
     private Double sum;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
+    private List<OrderItem> orderItems = new ArrayList<>();;
 
     public long getId() {
         return id;
@@ -32,19 +36,27 @@ public class Order implements Serializable {
         this.sum = sum;
     }
 
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
         return id == order.id &&
-                Objects.equals(sum, order.sum);
+                Objects.equals(sum, order.sum) &&
+                Objects.equals(orderItems, order.orderItems);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, sum);
+        return Objects.hash(id, sum, orderItems);
     }
 
     @Override
@@ -52,6 +64,7 @@ public class Order implements Serializable {
         return "Order{" +
                 "id=" + id +
                 ", sum=" + sum +
+                ", orderItems=" + orderItems.size() +
                 '}';
     }
 }

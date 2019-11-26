@@ -1,10 +1,14 @@
 package com.amakedon.om.data.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
-@Entity
+@Entity(name = "Category")
+@Table(name = "category")
 public class Category implements Serializable {
 
     @Id
@@ -14,7 +18,13 @@ public class Category implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    //private List<Product> products;
+    @OneToMany(
+            mappedBy = "category",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    private List<Product> products;
 
 
     public long getId() {
@@ -33,13 +43,29 @@ public class Category implements Serializable {
         this.name = name;
     }
 
-/*    public List<Product> getProducts() {
+    public List<Product> getProducts() {
         return products;
     }
 
     public void setProducts(List<Product> products) {
         this.products = products;
-    }*/
+    }
+
+    public void addProduct(Product product) {
+        products.add(product);
+        product.setCategory(this);
+    }
+
+    public void removeProduct(Product product) {
+        products.remove(product);
+        product.setCategory(null);
+    }
+
+    @PrePersist
+    public void populateProducts () {
+        for(Product product : products)
+            product.setCategory(this);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -47,14 +73,14 @@ public class Category implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
         return id == category.id &&
-                Objects.equals(name, category.name) ;
-                //&&
-                //Objects.equals(products, category.products)
+                Objects.equals(name, category.name)
+                &&
+                Objects.equals(products, category.products);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name); //, products
+        return Objects.hash(id, name, products);
     }
 
     @Override
@@ -62,7 +88,7 @@ public class Category implements Serializable {
         return "Category{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                //", products=" + products.size() +
+                ", products=" + products.size() +
                 '}';
     }
 }
