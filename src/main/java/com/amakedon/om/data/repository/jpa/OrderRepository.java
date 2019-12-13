@@ -1,4 +1,4 @@
-package com.amakedon.om.data.repository;
+package com.amakedon.om.data.repository.jpa;
 
 import com.amakedon.om.data.model.Order;
 import org.springframework.data.repository.CrudRepository;

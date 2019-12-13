@@ -1,5 +1,7 @@
 package com.amakedon.om.data.model;
 
+import org.springframework.data.elasticsearch.annotations.Document;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,10 +10,12 @@ import java.util.Objects;
 
 @Entity(name = "Order1")
 @Table(name = "order1")
+@Document(indexName = "order", type = "order")
 public class Order implements Serializable {
 
     @Id
     @GeneratedValue
+    @org.springframework.data.annotation.Id
     private long id;
 
     private Double sum;

@@ -3,6 +3,7 @@ package com.amakedon.om.controller;
 import com.amakedon.om.data.model.Order;
 import com.amakedon.om.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +42,12 @@ public class OrderController {
     @PutMapping
     public Order update(@RequestBody Order order) {
         return orderService.save(order);
+    }
+
+    @GetMapping("/search/{productName}")
+    public Iterable searchByProductName(@PathVariable String productName) {
+        //FIXME
+        return orderService.searchByProductName(productName, Pageable.unpaged());
     }
 
 }

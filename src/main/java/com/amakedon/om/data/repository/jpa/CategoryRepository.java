@@ -1,8 +1,7 @@
-package com.amakedon.om.data.repository;
+package com.amakedon.om.data.repository.jpa;
 
 import com.amakedon.om.data.model.Category;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
