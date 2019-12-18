@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ public class Category implements Serializable {
             orphanRemoval = true
     )
     @JsonManagedReference
-    private List<Product> products;
+    private List<Product> products = new ArrayList<>();
 
 
     public long getId() {
@@ -61,11 +62,12 @@ public class Category implements Serializable {
         product.setCategory(null);
     }
 
-    @PrePersist
-    public void populateProducts () {
-        for(Product product : products)
+    //@PrePersist
+/*    public void populateProducts () {
+        for(Product product : products) {
             product.setCategory(this);
-    }
+        }
+    }*/
 
     @Override
     public boolean equals(Object o) {

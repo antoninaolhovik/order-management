@@ -1,6 +1,8 @@
 package com.amakedon.om.data.model;
 
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,7 +24,8 @@ public class Order implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
-    private List<OrderItem> orderItems = new ArrayList<>();;
+    @Field(type = FieldType.Nested, includeInParent = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     public long getId() {
         return id;

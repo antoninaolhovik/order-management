@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +36,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    //@Transactional
     public Order save(Order order) {
         Order savedOrder = orderRepository.save(order);
         esOrderRepository.save(savedOrder);
         return savedOrder;
     }
 
+    @Transactional
     @Override
     public void update(Order order) {
         orderRepository.findById(order.getId())
@@ -49,12 +52,13 @@ public class OrderServiceImpl implements OrderService {
         esOrderRepository.save(order);
     }
 
+    @Transactional
     @Override
     public void deleteById(long id) {
         orderRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         orderRepository.deleteById(id);
-        esOrderRepository.deleteById(String.valueOf(id));
+        esOrderRepository.deleteById(id);
     }
 
     @Override
@@ -64,6 +68,7 @@ public class OrderServiceImpl implements OrderService {
         return list;
     }
 
+    @Transactional
     @Override
     public void deleteAll() {
         orderRepository.deleteAll();
