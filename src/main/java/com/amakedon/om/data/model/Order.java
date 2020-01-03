@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Entity(name = "Order1")
-@Table(name = "order1")
+@Entity(name = "Order")
+@Table(name = "orders")
 @Document(indexName = "order", type = "order")
 public class Order implements Serializable {
 

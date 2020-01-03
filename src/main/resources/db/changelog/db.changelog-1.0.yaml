@@ -1,0 +1,124 @@
+databaseChangeLog:
+- changeSet:
+    id: 1577977136267-1
+    author: antoninaolhovik
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: category_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(255)
+        tableName: category
+- changeSet:
+    id: 1577977136267-2
+    author: antoninaolhovik
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: order_item_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: quantity
+            type: INTEGER
+        - column:
+            name: product_id
+            type: BIGINT
+        - column:
+            name: order_id
+            type: BIGINT
+        tableName: order_item
+- changeSet:
+    id: 1577977136267-3
+    author: antoninaolhovik
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: orders_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: sum
+            type: numeric
+        tableName: orders
+- changeSet:
+    id: 1577977136267-4
+    author: antoninaolhovik
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: product_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: price
+            type: FLOAT8
+        - column:
+            constraints:
+              nullable: false
+            name: sku
+            type: VARCHAR(255)
+        - column:
+            name: category_id
+            type: BIGINT
+        tableName: product
+- changeSet:
+    id: 1577977136267-5
+    author: antoninaolhovik
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: category_id
+        baseTableName: product
+        constraintName: fk1_product
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: category
+        validate: true
+- changeSet:
+    id: 1577977136267-6
+    author: antoninaolhovik
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: product_id
+        baseTableName: order_item
+        constraintName: fk_order_item
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: product
+        validate: true
+

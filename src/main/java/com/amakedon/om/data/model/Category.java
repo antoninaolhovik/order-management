@@ -52,23 +52,6 @@ public class Category implements Serializable {
         this.products = products;
     }
 
-    public void addProduct(Product product) {
-        products.add(product);
-        product.setCategory(this);
-    }
-
-    public void removeProduct(Product product) {
-        products.remove(product);
-        product.setCategory(null);
-    }
-
-    //@PrePersist
-/*    public void populateProducts () {
-        for(Product product : products) {
-            product.setCategory(this);
-        }
-    }*/
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

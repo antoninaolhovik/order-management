@@ -2,9 +2,11 @@ package com.amakedon.om.service;
 
 import com.amakedon.om.data.exception.EntityNotFoundException;
 import com.amakedon.om.data.model.Product;
+import com.amakedon.om.data.repository.jpa.CategoryRepository;
 import com.amakedon.om.data.repository.jpa.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +16,12 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productRepository;
 
+    private CategoryRepository categoryRepository;
+
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -25,7 +30,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product save(Product product) {
+        if (product.getCategory() != null) {
+            categoryRepository.findById(product.getCategory().getId())
+                    .orElseThrow(EntityNotFoundException::new);
+            //FIXME
+        }
         return productRepository.save(product);
     }
 

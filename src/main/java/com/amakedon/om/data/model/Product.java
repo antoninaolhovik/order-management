@@ -22,7 +22,7 @@ public class Product implements Serializable {
     @Column(nullable = false)
     private Double price;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade=CascadeType.MERGE)
     @JoinColumn(name = "category_id")
     @JsonBackReference
     private Category category;
