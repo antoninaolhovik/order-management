@@ -1,13 +1,12 @@
 package com.amakedon.om.service;
 
-import com.amakedon.om.data.exception.EntityNotFoundException;
+import com.amakedon.om.exception.EntityNotFoundException;
 import com.amakedon.om.data.model.Order;
 import com.amakedon.om.data.repository.es.EsOrderRepository;
 import com.amakedon.om.data.repository.jpa.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +20,10 @@ public class OrderServiceImpl implements OrderService {
 
     private EsOrderRepository esOrderRepository;
 
-    private ElasticsearchOperations elasticsearchOperations;
-
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, EsOrderRepository esOrderRepository, ElasticsearchOperations elasticsearchOperations) {
+    public OrderServiceImpl(OrderRepository orderRepository, EsOrderRepository esOrderRepository) {
         this.orderRepository = orderRepository;
         this.esOrderRepository = esOrderRepository;
-        this.elasticsearchOperations = elasticsearchOperations;
     }
 
     @Override

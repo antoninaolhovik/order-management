@@ -1,6 +1,6 @@
 package com.amakedon.om.service;
 
-import com.amakedon.om.data.exception.EntityNotFoundException;
+import com.amakedon.om.exception.EntityNotFoundException;
 import com.amakedon.om.data.model.Category;
 import com.amakedon.om.data.repository.jpa.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;

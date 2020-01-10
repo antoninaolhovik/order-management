@@ -16,7 +16,7 @@ import java.util.Objects;
 public class Order implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @org.springframework.data.annotation.Id
     private long id;
 

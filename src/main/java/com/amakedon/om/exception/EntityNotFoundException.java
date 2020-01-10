@@ -1,4 +1,4 @@
-package com.amakedon.om.data.exception;
+package com.amakedon.om.exception;
 
 public class EntityNotFoundException extends RuntimeException {
     public EntityNotFoundException() {
