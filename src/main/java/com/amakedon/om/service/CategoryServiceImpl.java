@@ -1,6 +1,6 @@
 package com.amakedon.om.service;
 
-import com.amakedon.om.exception.EntityNotFoundException;
+import com.amakedon.om.exception.ResourceNotFoundException;
 import com.amakedon.om.data.model.Category;
 import com.amakedon.om.data.repository.jpa.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category findById(long id) {
-        return categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -32,14 +32,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void update(Category category) {
         categoryRepository.findById(category.getId())
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         categoryRepository.save(category);
     }
 
     @Override
     public void deleteById(long id) {
         categoryRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         categoryRepository.deleteById(id);
     }
 

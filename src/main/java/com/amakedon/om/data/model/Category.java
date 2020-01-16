@@ -21,8 +21,8 @@ public class Category implements Serializable {
 
     @OneToMany(
             mappedBy = "category",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            cascade = CascadeType.ALL//,
+            //orphanRemoval = true
     )
     @JsonManagedReference
     private List<Product> products = new ArrayList<>();
@@ -52,6 +52,10 @@ public class Category implements Serializable {
         this.products = products;
     }
 
+    public void addProduct(Product product) {
+        product.setCategory(this);
+        products.add(product);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

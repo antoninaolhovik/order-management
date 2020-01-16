@@ -1,6 +1,6 @@
 package com.amakedon.om.service;
 
-import com.amakedon.om.exception.EntityNotFoundException;
+import com.amakedon.om.exception.ResourceNotFoundException;
 import com.amakedon.om.data.model.Order;
 import com.amakedon.om.data.repository.es.EsOrderRepository;
 import com.amakedon.om.data.repository.jpa.OrderRepository;
@@ -28,7 +28,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order findById(long id) {
-        return orderRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return orderRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void update(Order order) {
         orderRepository.findById(order.getId())
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         orderRepository.save(order);
         esOrderRepository.save(order);
     }
@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteById(long id) {
         orderRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         orderRepository.deleteById(id);
         esOrderRepository.deleteById(id);
     }

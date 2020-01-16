@@ -1,6 +1,6 @@
 package com.amakedon.om.service;
 
-import com.amakedon.om.exception.EntityNotFoundException;
+import com.amakedon.om.exception.ResourceNotFoundException;
 import com.amakedon.om.data.model.Product;
 import com.amakedon.om.data.repository.jpa.CategoryRepository;
 import com.amakedon.om.data.repository.jpa.ProductRepository;
@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product findById(long id) {
-        return productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return productRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     public Product save(Product product) {
         if (product.getCategory() != null) {
             categoryRepository.findById(product.getCategory().getId())
-                    .orElseThrow(EntityNotFoundException::new);
+                    .orElseThrow(ResourceNotFoundException::new);
             //FIXME
         }
         return productRepository.save(product);
@@ -43,14 +43,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void update(Product product) {
         productRepository.findById(product.getId())
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         productRepository.save(product);
     }
 
     @Override
     public void deleteById(long id) {
         productRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         productRepository.deleteById(id);
     }
 

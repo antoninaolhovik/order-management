@@ -1,6 +1,6 @@
 package com.amakedon.om.service;
 
-import com.amakedon.om.exception.EntityNotFoundException;
+import com.amakedon.om.exception.ResourceNotFoundException;
 import com.amakedon.om.data.model.OrderItem;
 import com.amakedon.om.data.repository.jpa.OrderItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public OrderItem findById(long id) {
-        return orderItemRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return orderItemRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -32,14 +32,14 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public void update(OrderItem orderItem) {
         orderItemRepository.findById(orderItem.getId())
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         orderItemRepository.save(orderItem);
     }
 
     @Override
     public void deleteById(long id) {
         orderItemRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         orderItemRepository.deleteById(id);
     }
 
