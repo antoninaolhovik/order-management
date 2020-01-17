@@ -66,8 +66,8 @@ public class ProductController {
         return convertToDto(productService.save(product));
     }
 
-    private ProductDto convertToDto(Product post) {
-        return modelMapper.map(post, ProductDto.class);
+    private ProductDto convertToDto(Product product) {
+        return modelMapper.map(product, ProductDto.class);
     }
 
     private Product convertToEntity(ProductDto productDto) {
