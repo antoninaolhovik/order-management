@@ -1,21 +1,16 @@
 package com.amakedon.om.controller;
 
 import com.amakedon.om.data.dto.CategoryDto;
-import com.amakedon.om.data.dto.ProductDto;
 import com.amakedon.om.data.model.Category;
 import com.amakedon.om.data.model.Product;
-import com.amakedon.om.exception.ResourceNotFoundException;
 import com.amakedon.om.service.CategoryService;
 import com.amakedon.om.service.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,42 +46,26 @@ public class CategoryController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto create(@RequestBody CategoryDto categoryDto) {
-        validateProductExistence(categoryDto.getProducts());
         Category category = convertToEntity(categoryDto);
+        productService.validateProductExistence(category.getProducts());
         return convertToDto(categoryService.save(category));
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        if (categoryService.findById(id) == null) {
-            throw new ResourceNotFoundException("Category with id " + id + "not found");
-        }
         categoryService.deleteById(id);
     }
 
     @PutMapping("/{id}")
     public CategoryDto update(@RequestBody CategoryDto categoryDto, @PathVariable Long id) {
-        if (categoryService.findById(id) == null) {
-            throw new ResourceNotFoundException("Category with id " + id + "not found");
-        }
-        validateProductExistence(categoryDto.getProducts());
+        categoryService.findById(id);
         Category category = convertToEntity(categoryDto);
         category.setId(id);
+        productService.validateProductExistence(category.getProducts());
         return convertToDto(categoryService.save(category));
     }
 
-    private void validateProductExistence(List<ProductDto> products) {
-        //Check if null or not??
-        List<ProductDto> list = products
-                .stream()
-                .filter(product -> Objects.isNull(productService.findById(product
-                        .getId())))
-                .collect(Collectors.toList());
 
-        if (!CollectionUtils.isEmpty(list)) {
-            new ResourceNotFoundException("Product not found"); //Add ids
-        }
-    }
 
     private CategoryDto convertToDto(Category category) {
         return modelMapper.map(category, CategoryDto.class);
@@ -102,8 +81,8 @@ public class CategoryController {
                     return p1;
                 })
                 .collect(Collectors.toList());
-        System.out.println("PRODUCTS " + products);
         category.setProducts(products);
+        //FIXME
         return category;
     }
 }

@@ -2,7 +2,6 @@ package com.amakedon.om.controller;
 
 import com.amakedon.om.data.dto.ProductDto;
 import com.amakedon.om.data.model.Product;
-import com.amakedon.om.exception.ResourceNotFoundException;
 import com.amakedon.om.service.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,18 +47,12 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        if (productService.findById(id) == null) {
-            throw new ResourceNotFoundException("Product with id " + id + "not found");
-        }
         productService.deleteById(id);
     }
 
     @PutMapping("/{id}")
     public ProductDto update(@RequestBody ProductDto productDto, @PathVariable Long id) {
         Product product = productService.findById(id);
-        if (product == null) {
-            throw new ResourceNotFoundException("Product with id " + id + "not found");
-        }
         product.setSku(productDto.getSku());
         product.setName(productDto.getName());
         product.setPrice(productDto.getPrice());

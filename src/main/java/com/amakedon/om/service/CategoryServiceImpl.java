@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
 
     @Autowired
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
@@ -21,7 +21,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category findById(long id) {
-        return categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return categoryRepository
+                .findById(id).orElseThrow(() -> new ResourceNotFoundException("Category with id " + id + "not found"));
     }
 
     @Override
@@ -31,15 +32,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void update(Category category) {
-        categoryRepository.findById(category.getId())
-                .orElseThrow(ResourceNotFoundException::new);
+        findById(category.getId());
         categoryRepository.save(category);
     }
 
     @Override
     public void deleteById(long id) {
-        categoryRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+        findById(id);
         categoryRepository.deleteById(id);
     }
 

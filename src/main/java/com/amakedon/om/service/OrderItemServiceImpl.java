@@ -21,7 +21,8 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public OrderItem findById(long id) {
-        return orderItemRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return orderItemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("OrderItem with id " + id + "not found"));
     }
 
     @Override
@@ -31,15 +32,13 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public void update(OrderItem orderItem) {
-        orderItemRepository.findById(orderItem.getId())
-                .orElseThrow(ResourceNotFoundException::new);
+        findById(orderItem.getId());
         orderItemRepository.save(orderItem);
     }
 
     @Override
     public void deleteById(long id) {
-        orderItemRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+        findById(id);
         orderItemRepository.deleteById(id);
     }
 

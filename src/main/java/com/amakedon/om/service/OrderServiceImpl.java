@@ -28,7 +28,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order findById(long id) {
-        return orderRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + "not found"));
     }
 
     @Override
@@ -42,8 +43,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public void update(Order order) {
-        orderRepository.findById(order.getId())
-                .orElseThrow(ResourceNotFoundException::new);
+        findById(order.getId());
         orderRepository.save(order);
         esOrderRepository.save(order);
     }
@@ -51,8 +51,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public void deleteById(long id) {
-        orderRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
+        findById(id);
         orderRepository.deleteById(id);
         esOrderRepository.deleteById(id);
     }

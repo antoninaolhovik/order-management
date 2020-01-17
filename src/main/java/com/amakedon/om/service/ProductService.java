@@ -17,4 +17,6 @@ public interface ProductService {
     List<Product> findAll();
 
     void deleteAll();
+
+    void validateProductExistence(List<Product> products);
 }
