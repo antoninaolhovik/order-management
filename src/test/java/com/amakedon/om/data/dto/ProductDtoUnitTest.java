@@ -4,6 +4,8 @@ import com.amakedon.om.data.model.Product;
 import org.modelmapper.ModelMapper;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.apache.commons.lang3.RandomStringUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,7 +20,7 @@ class ProductDtoUnitTest {
         product.setId(1L);
         product.setName(randomAlphabetic(6));
         product.setSku(randomAlphabetic(6));
-        product.setPrice(1d);
+        product.setPrice(BigDecimal.ONE);
 
         ProductDto productDto = modelMapper.map(product, ProductDto.class);
         assertEquals(product.getId(), productDto.getId());
@@ -34,7 +36,7 @@ class ProductDtoUnitTest {
         productDto.setId(1L);
         productDto.setName(randomAlphabetic(6));
         productDto.setSku(randomAlphabetic(6));
-        productDto.setPrice(1d);
+        productDto.setPrice(BigDecimal.ONE);
 
         Product product = modelMapper.map(productDto, Product.class);
         assertEquals(productDto.getId(), product.getId());

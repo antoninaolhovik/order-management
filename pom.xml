@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-maven-plugin</artifactId>
-			<version>3.6.3</version>
+			<version>3.4.1</version>
 		</dependency>
 
 		<dependency>
@@ -142,28 +142,43 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
 			<plugin>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-maven-plugin</artifactId>
-				<version>3.8.4</version>
+				<version>3.4.1</version>
 				<configuration>
 					<propertyFile>${liquibase.propertyFile}</propertyFile>
+					<changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</changeLogFile>
+					<diffChangeLogFile>src/main/resources/db/changelog/db.changelog-1.1.yaml</diffChangeLogFile>
+					<verbose>true</verbose>
+					<logging>debug</logging>
 				</configuration>
 				<dependencies>
 					<dependency>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-starter-data-jpa</artifactId>
-						<version>2.2.0.RELEASE</version>
+						<groupId>org.liquibase.ext</groupId>
+						<artifactId>liquibase-hibernate4</artifactId>
+						<version>3.5</version>
 					</dependency>
 					<dependency>
-						<groupId>org.liquibase.ext</groupId>
-						<artifactId>liquibase-hibernate5</artifactId>
-						<version>3.8</version>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+						<version>4.1.7.RELEASE</version>
+					</dependency>
+					<dependency>
+						<groupId>org.springframework.data</groupId>
+						<artifactId>spring-data-jpa</artifactId>
+						<version>1.7.3.RELEASE</version>
+					</dependency>
+
+					<dependency>
+						<groupId>org.yaml</groupId>
+						<artifactId>snakeyaml</artifactId>
+						<version>1.24</version>
 					</dependency>
 
 				</dependencies>
 			</plugin>
+
 		</plugins>
 	</build>
 

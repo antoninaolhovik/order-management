@@ -1,0 +1,27 @@
+databaseChangeLog:
+- changeSet:
+    id: 1579809457861-1
+    author: antoninaolhovik (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            constraints:
+              constraints:
+                nullable: false
+            name: created_date
+            type: DATE
+        tableName: orders
+- changeSet:
+    id: 1579809457861-2
+    author: antoninaolhovik (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: modified_date
+            type: DATE
+        tableName: orders
+
+
+

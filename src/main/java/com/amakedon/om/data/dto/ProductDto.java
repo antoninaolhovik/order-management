@@ -2,6 +2,8 @@ package com.amakedon.om.data.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class ProductDto {
 
@@ -11,6 +13,6 @@ public class ProductDto {
 
     private String sku;
 
-    private Double price;
+    private BigDecimal price;
 
 }
