@@ -1,6 +1,7 @@
 package com.amakedon.om.data.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 

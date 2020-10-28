@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderDto create(@RequestBody OrderDto orderDto) {
+    public OrderDto create(@RequestBody @Valid OrderDto orderDto) {
         Order order = convertToEntity(orderDto);
         validateProductExistence(order);
         return convertToDto(orderService.save(order));
@@ -86,6 +87,12 @@ public class OrderController {
     }
 
     private void validateProductExistence(Order order) {
+        //FIXME
+        order.getOrderItems()
+                .stream()
+                .map(OrderItem::getProduct)
+                .forEach(System.out::println);
+
         List<Product> product = order.getOrderItems()
                 .stream()
                 .map(OrderItem::getProduct)

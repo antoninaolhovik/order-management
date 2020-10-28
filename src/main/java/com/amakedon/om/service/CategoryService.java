@@ -17,6 +17,4 @@ public interface CategoryService {
     List<Category> findAll();
 
     void deleteAll();
-
-    boolean isCategoryExists(Category category);
 }

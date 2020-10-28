@@ -1,5 +1,6 @@
 package com.amakedon.om.service;
 
+import com.amakedon.om.data.model.Category;
 import com.amakedon.om.exception.ResourceNotFoundException;
 import com.amakedon.om.data.model.Product;
 import com.amakedon.om.data.repository.jpa.CategoryRepository;
@@ -12,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,10 +38,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public Product save(Product product) {
-        if (product.getCategory() != null) {
-            categoryRepository.findById(product.getCategory().getId());
-            //FIXME
+        if (product.getCategory() == null) {
+            throw new ResourceNotFoundException("Category not found ");
         }
+        Category category = categoryRepository.findById(product.getCategory().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id " + product.getCategory().getId() + " not found"));
+
+        product.setCategory(category);
+
         return productRepository.save(product);
     }
 
@@ -71,15 +77,18 @@ public class ProductServiceImpl implements ProductService {
         //Check if null or not??
         List<Product> list = products
                 .stream()
-                .filter(product -> Objects.isNull(productRepository.findById(product
-                        .getId())))
+                .filter(product -> !productRepository.findById(product
+                        .getId()).isPresent())
                 .collect(Collectors.toList());
 
         if (!CollectionUtils.isEmpty(list)) {
-            throw new ResourceNotFoundException("Products not found " + list
+            throw new ResourceNotFoundException("Products with ids not found:" + list
                     .stream()
                     .map(p -> String.valueOf(p.getId()))
                     .collect(Collectors.joining(",")));
         }
     }
+
+
+
 }

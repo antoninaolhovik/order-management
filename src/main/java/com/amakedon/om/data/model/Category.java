@@ -10,11 +10,7 @@ import java.util.Objects;
 
 @Entity(name = "Category")
 @Table(name = "category")
-public class Category implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class Category extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
@@ -27,14 +23,6 @@ public class Category implements Serializable {
     @JsonManagedReference
     private List<Product> products = new ArrayList<>();
 
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -53,15 +41,17 @@ public class Category implements Serializable {
     }
 
     public void addProduct(Product product) {
+        if (product.isNew()) {
+            getProducts().add(product);
+        }
         product.setCategory(this);
-        products.add(product);
     }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
-        return id == category.id &&
+        return getId() == category.getId() &&
                 Objects.equals(name, category.name)
                 &&
                 Objects.equals(products, category.products);
@@ -69,13 +59,13 @@ public class Category implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, products);
+        return Objects.hash(getId(), name, products);
     }
 
     @Override
     public String toString() {
         return "Category{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 ", products=" + products.size() +
                 '}';

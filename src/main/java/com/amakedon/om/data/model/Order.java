@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Entity(name = "Order")
 @Table(name = "orders")
-@Document(indexName = "order", type = "order")
+@Document(indexName = "order")
 public class Order implements Serializable {
 
     @Id

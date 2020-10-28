@@ -26,7 +26,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public Iterable findAll() {
+    public Iterable<ProductDto> findAll() {
         List<Product> products = productService.findAll();
         return products.stream()
                 .map(this::convertToDto)
@@ -65,9 +65,6 @@ public class ProductController {
 
     private Product convertToEntity(ProductDto productDto) {
         Product product = modelMapper.map(productDto, Product.class);
-        if (product.getCategory() != null) {
-            product.getCategory().addProduct(product);
-        }
 
 
 /*        if (productDto.getId() != null) {

@@ -1,25 +1,14 @@
 package com.amakedon.om.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.client.ClientConfiguration;
-import org.springframework.data.elasticsearch.client.RestClients;
-import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
-import org.springframework.data.elasticsearch.core.EntityMapper;
-import org.springframework.data.mapping.MappingException;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
-public class EsConfig extends AbstractElasticsearchConfiguration {
+public class EsConfig { //extends AbstractElasticsearchConfiguration
 
     //@Value("#{'${elasticsearch.cluster-nodes}'.split(',')}")
     //@Value("${elasticsearch.cluster-nodes}")
@@ -31,25 +20,32 @@ public class EsConfig extends AbstractElasticsearchConfiguration {
 
     private final String elasticScheme = "http";
 
-    @Bean
+/*    @Bean
     @Override
     public RestHighLevelClient elasticsearchClient() {
-        return RestClients.create(ClientConfiguration.localhost()).rest();
+        //ClientConfiguration.localhost()
+        RestHighLevelClient client = new RestHighLevelClient(
+                RestClient.builder(
+                        new HttpHost(host, port, elasticScheme)));
+        return client;
+    }*/
+
+
+    @Bean(destroyMethod = "close")
+    public RestHighLevelClient client() {
+        RestHighLevelClient client = new RestHighLevelClient(
+                RestClient.builder(new HttpHost(host, port, "http")));
+        return client;
     }
 
-
-    @Bean
+/*    @Bean
     @Override
     public EntityMapper entityMapper() {
-/*        ElasticsearchEntityMapper entityMapper = new ElasticsearchEntityMapper(elasticsearchMappingContext(),
-                new DefaultConversionService());
-        entityMapper.setConversions(elasticsearchCustomConversions());*/
-
         return new CustomEntityMapper();
-    }
+    }*/
 
 
-    public class CustomEntityMapper implements EntityMapper {
+/*    public class CustomEntityMapper implements EntityMapper {
 
         private final ObjectMapper objectMapper;
 
@@ -87,6 +83,6 @@ public class EsConfig extends AbstractElasticsearchConfiguration {
                 throw new MappingException(ex.getMessage(), ex);
             }
         }
-    }
+    }*/
 
 }

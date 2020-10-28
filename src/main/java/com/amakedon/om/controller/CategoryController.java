@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class CategoryController {
     }
 
     @GetMapping
-    public Iterable findAll() {
+    public Iterable<CategoryDto> findAll() {
         List<Category> categories = categoryService.findAll();
         return categories.stream()
                 .map(this::convertToDto)
@@ -45,7 +46,7 @@ public class CategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto create(@RequestBody CategoryDto categoryDto) {
+    public CategoryDto create(@RequestBody @Valid CategoryDto categoryDto) {
         Category category = convertToEntity(categoryDto);
         productService.validateProductExistence(category.getProducts());
         return convertToDto(categoryService.save(category));

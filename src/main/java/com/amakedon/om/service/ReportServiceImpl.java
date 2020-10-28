@@ -1,25 +1,21 @@
 package com.amakedon.om.service;
 
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
-import org.elasticsearch.search.aggregations.metrics.sum.ParsedSum;
-import org.elasticsearch.search.aggregations.metrics.sum.SumAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
-
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -30,22 +26,25 @@ public class ReportServiceImpl implements ReportService {
     private static final String SUB_AGGREGATION = "total_amount";
     private static final String SUB_AGGREGATION_FIELD = "sum";
 
-    private ElasticsearchOperations elasticsearchOperations;
+    private RestHighLevelClient elasticsearchClient;
+
+    private static final Logger LOG = LoggerFactory.getLogger(ReportServiceImpl.class);
+
 
     @Autowired
-    public ReportServiceImpl(ElasticsearchOperations elasticsearchOperations) {
-        this.elasticsearchOperations = elasticsearchOperations;
+    public ReportServiceImpl(RestHighLevelClient elasticsearchClient) {
+        this.elasticsearchClient = elasticsearchClient;
     }
 
     @Override
     public Map<String, BigDecimal> getAmountOfIncomeByDate(Pageable pageable) {
 
-        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder() //
+/*        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder() //
                 .withQuery(matchAllQuery()) //
                 .withSearchType(SearchType.DEFAULT) //
                 .addAggregation(AggregationBuilders.dateHistogram(DATE_HISTOGRAM)
                         .field(DATE_HISTOGRAM_FIELD)
-                        .dateHistogramInterval(DateHistogramInterval.DAY)
+                        .calendarInterval(DateHistogramInterval.DAY)
                         .format(DATE_FORMAT)
                         .subAggregation(AggregationBuilders.sum(SUB_AGGREGATION).field(SUB_AGGREGATION_FIELD)))
 
@@ -68,7 +67,36 @@ public class ReportServiceImpl implements ReportService {
                     });
                 });
             }
-        });
+        });*/
+
+        SearchResponse response = null;
+        try {
+            response = elasticsearchClient.search(new SearchRequest("order")
+                    .source(new SearchSourceBuilder()
+                            //.query(query)
+                            .aggregation(
+                                    AggregationBuilders.terms(DATE_HISTOGRAM).field(DATE_HISTOGRAM_FIELD)
+                                            .subAggregation(AggregationBuilders.dateHistogram(SUB_AGGREGATION)
+                                                    .field(SUB_AGGREGATION_FIELD)
+                                                    //.fixedInterval(DateHistogramInterval.days(3652))
+                                                    //.extendedBounds(new ExtendedBounds(1940L, 2009L))
+                                                    .format(DATE_FORMAT)
+                                                    .subAggregation(AggregationBuilders.avg("avg_children").field("children"))
+                                            )
+                            )
+                            .from(pageable.getPageNumber()*pageable.getPageSize()) //FIXME
+                            .size(pageable.getPageSize())
+                            .trackTotalHits(true)
+                    ), RequestOptions.DEFAULT);
+            LOG.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
+            LOG.trace("elasticsearch response: {} hits", response.toString());
+        } catch (IOException e) {
+            LOG.error("Error during ES search", e);
+        }
+
+
+
+        Map<String, BigDecimal> incomes = new HashMap<>();
         return incomes;
     }
 
