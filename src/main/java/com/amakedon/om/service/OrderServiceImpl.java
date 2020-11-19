@@ -1,5 +1,6 @@
 package com.amakedon.om.service;
 
+import com.amakedon.om.data.model.Product;
 import com.amakedon.om.exception.ResourceNotFoundException;
 import com.amakedon.om.data.model.Order;
 import com.amakedon.om.data.repository.es.EsOrderRepository;
@@ -20,28 +21,37 @@ public class OrderServiceImpl implements OrderService {
 
     private EsOrderRepository esOrderRepository;
 
+    private ProductService productService;
+
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, EsOrderRepository esOrderRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, EsOrderRepository esOrderRepository, ProductService productService) {
         this.orderRepository = orderRepository;
         this.esOrderRepository = esOrderRepository;
+        this.productService = productService;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Order findById(long id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + "not found"));
     }
 
     @Override
-    //@Transactional
+    @Transactional
     public Order save(Order order) {
+        order.getOrderItems().forEach(o -> {
+            Product p = productService.findById(o.getProduct().getId());
+            o.setProduct(p);
+        });
+        order.getOrderItems().forEach(o -> System.out.println(o.getProduct()));
         Order savedOrder = orderRepository.save(order);
         esOrderRepository.save(savedOrder);
         return savedOrder;
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void update(Order order) {
         findById(order.getId());
         orderRepository.save(order);
@@ -57,6 +67,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Order> findAll() {
         List<Order> list = new ArrayList<>();
         orderRepository.findAll().forEach(list::add);

@@ -87,12 +87,6 @@ public class OrderController {
     }
 
     private void validateProductExistence(Order order) {
-        //FIXME
-        order.getOrderItems()
-                .stream()
-                .map(OrderItem::getProduct)
-                .forEach(System.out::println);
-
         List<Product> product = order.getOrderItems()
                 .stream()
                 .map(OrderItem::getProduct)

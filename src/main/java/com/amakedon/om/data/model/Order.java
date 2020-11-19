@@ -33,14 +33,12 @@ public class Order implements Serializable {
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(name = "created_date", nullable = false, updatable = false)
-    @Field(type = FieldType.Date, store = true,
-            format = DateFormat.custom, pattern = "8yyyy-MM-dd")
+    @Field(type = FieldType.Date, store = true, format = DateFormat.custom, pattern = "uuuu-MM-dd")
     @CreationTimestamp
     private LocalDate createdDate;
 
     @Column(name = "modified_date")
-    @Field(type = FieldType.Date, store = true,
-            format = DateFormat.custom, pattern = "8yyyy-MM-dd")
+    @Field(type = FieldType.Date, store = true, format = DateFormat.custom, pattern = "uuuu-MM-dd")
     @UpdateTimestamp
     private LocalDate modifiedDate;
 
