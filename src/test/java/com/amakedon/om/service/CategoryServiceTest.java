@@ -3,6 +3,7 @@ package com.amakedon.om.service;
 import com.amakedon.om.data.model.Category;
 import com.amakedon.om.data.repository.jpa.CategoryRepository;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,8 +19,7 @@ import java.util.Optional;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.any;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -43,7 +43,7 @@ class CategoryServiceTest {
     @Test
     public void testFindCategory() {
 
-        Long categoryId = 1L;
+        long categoryId = 1L;
 
         Category category = new Category();
         category.setName(randomAlphabetic(6));
@@ -88,6 +88,37 @@ class CategoryServiceTest {
 
         categoryService.save(category);
         verify(categoryRepository, times(1)).save(category);
+    }
+
+    @Test
+    public void testUpdateCategory() {
+
+        Long categoryId = 1L;
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setName(randomAlphabetic(6));
+
+        Mockito.when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+        String updatedName = randomAlphabetic(6);
+        category.setName(updatedName);
+        Mockito.when(categoryRepository.save(category)).thenReturn(category);
+
+        categoryService.update(category);
+
+    }
+
+    @Test
+    public void testDeleteCategory() {
+        Long categoryId = 1L;
+
+        Category category = new Category();
+        category.setName(randomAlphabetic(6));
+
+        Mockito.when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+
+        categoryService.deleteById(categoryId);
+        verify(categoryRepository, times(1)).deleteById(categoryId);
     }
 
 }
