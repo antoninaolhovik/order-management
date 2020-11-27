@@ -4,20 +4,18 @@ import com.amakedon.om.data.model.Category;
 import com.amakedon.om.data.repository.es.EsOrderRepository;
 import com.amakedon.om.data.repository.jpa.CategoryRepository;
 import com.amakedon.om.service.OrderServiceImpl;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.orm.jpa.*;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import static org.assertj.core.api.Assertions.*;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@ActiveProfiles("h2")
 public class CategoryRepositoryIntegrationTest {
 
     @Autowired

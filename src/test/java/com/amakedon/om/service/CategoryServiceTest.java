@@ -23,8 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-//@SpringBootTest
-//@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("h2")
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
