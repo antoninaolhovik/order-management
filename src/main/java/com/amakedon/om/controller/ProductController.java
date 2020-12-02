@@ -51,12 +51,12 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ProductDto update(@RequestBody ProductDto productDto, @PathVariable Long id) {
+    public void update(@RequestBody ProductDto productDto, @PathVariable Long id) {
         Product product = productService.findById(id);
         product.setSku(productDto.getSku());
         product.setName(productDto.getName());
         product.setPrice(productDto.getPrice());
-        return convertToDto(productService.save(product));
+        productService.update(product);
     }
 
     private ProductDto convertToDto(Product product) {
