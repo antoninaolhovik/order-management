@@ -58,12 +58,12 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public CategoryDto update(@RequestBody CategoryDto categoryDto, @PathVariable Long id) {
+    public void update(@RequestBody CategoryDto categoryDto, @PathVariable Long id) {
         categoryService.findById(id);
         Category category = convertToEntity(categoryDto);
         category.setId(id);
         productService.validateProductExistence(category.getProducts());
-        return convertToDto(categoryService.save(category));
+        categoryService.update(category);
     }
 
 
