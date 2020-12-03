@@ -61,12 +61,12 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public OrderDto update(@RequestBody OrderDto orderDto, @PathVariable Long id) {
+    public void update(@RequestBody OrderDto orderDto, @PathVariable Long id) {
         orderService.findById(id);
 
         Order order = convertToEntity(orderDto);
         order.setId(id);
-        return convertToDto(orderService.save(order));
+        orderService.update(order);
     }
 
     @GetMapping("/search/{productName}")
