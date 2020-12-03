@@ -8,22 +8,28 @@ import com.amakedon.om.data.model.Product;
 import com.amakedon.om.service.OrderService;
 import com.amakedon.om.service.ProductService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -32,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@ActiveProfiles("h2")
 @AutoConfigureMockMvc
 class OrderControllerTest {
 
@@ -50,7 +55,7 @@ class OrderControllerTest {
         OrderDto orderDto = createTestOrderDto(1L);
         orderDto.getOrderItems().forEach(oi -> oi.setProductId(null));
 
-        given(orderService.save(Mockito.any())).willReturn(createTestOrder(1L));
+        given(orderService.save(any())).willReturn(createTestOrder(1L));
 
         mvc.perform(post("/api/orders")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +72,7 @@ class OrderControllerTest {
         long productId = 1L;
         given(productService.findById(productId)).willReturn(product);
 
-        given(orderService.save(Mockito.any())).willReturn(createTestOrder(1L));
+        given(orderService.save(any())).willReturn(createTestOrder(1L));
 
         mvc.perform(post("/api/orders")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +83,7 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.orderItems", hasSize(1)));
 
 
-        verify(orderService, VerificationModeFactory.times(1)).save(Mockito.any());
+        verify(orderService, VerificationModeFactory.times(1)).save(any());
         reset(orderService);
     }
 
@@ -122,7 +127,7 @@ class OrderControllerTest {
                 .content(JsonUtil.toJson(orderDto)))
                 .andExpect(status().isOk());
         verify(orderService, VerificationModeFactory.times(1))
-                .update(Mockito.any());
+                .update(any());
     }
 
 
@@ -135,6 +140,25 @@ class OrderControllerTest {
                 .andExpect(status().isOk());
         verify(orderService, VerificationModeFactory.times(1))
                 .deleteById(orderId);
+    }
+
+    @Test
+    public void whenSearchByProductName_thenReturnOrder() throws Exception {
+        long orderId = 1L;
+
+        Order order = createTestOrder(orderId);
+
+        List<Order> orders = new ArrayList<>();
+        orders.add(order);
+        Page<Order> pagedResponse = new PageImpl(orders);
+        given(orderService.searchByProductName(anyString(), any(Pageable.class))).willReturn(pagedResponse);
+
+        String productName = "test";
+        mvc.perform(get("/api/orders/search/" + productName)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        verify(orderService, VerificationModeFactory.times(1))
+                .searchByProductName(anyString(), any(Pageable.class));
     }
 
     private OrderDto createTestOrderDto(long orderId) {
