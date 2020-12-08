@@ -7,5 +7,5 @@ import java.util.Map;
 
 public interface ReportService {
 
-    Map<String, BigDecimal> getAmountOfIncomeByDate (Pageable pageable);
+    Map<String, Double> getAmountOfIncomeByDate (Pageable pageable);
 }

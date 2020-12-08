@@ -1,103 +1,100 @@
 package com.amakedon.om.service;
 
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import com.amakedon.om.data.model.Order;
+import com.amakedon.om.data.repository.es.EsOrderRepository;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchPage;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class ReportServiceImpl implements ReportService {
 
     private static final String DATE_HISTOGRAM = "amount_per_day";
     private static final String DATE_HISTOGRAM_FIELD = "createdDate";
-    private static final String DATE_FORMAT = "8yyyy-MM-dd";
     private static final String SUB_AGGREGATION = "total_amount";
     private static final String SUB_AGGREGATION_FIELD = "sum";
 
-    private RestHighLevelClient elasticsearchClient;
-
     private static final Logger LOG = LoggerFactory.getLogger(ReportServiceImpl.class);
 
+    private EsOrderRepository esOrderRepository;
 
     @Autowired
-    public ReportServiceImpl(RestHighLevelClient elasticsearchClient) {
-        this.elasticsearchClient = elasticsearchClient;
+    public ReportServiceImpl(EsOrderRepository esOrderRepository) {
+        this.esOrderRepository = esOrderRepository;
     }
 
     @Override
-    public Map<String, BigDecimal> getAmountOfIncomeByDate(Pageable pageable) {
+    public Map<String, Double> getAmountOfIncomeByDate(Pageable pageable) {
 
-/*        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder() //
-                .withQuery(matchAllQuery()) //
-                .withSearchType(SearchType.DEFAULT) //
-                .addAggregation(AggregationBuilders.dateHistogram(DATE_HISTOGRAM)
-                        .field(DATE_HISTOGRAM_FIELD)
-                        .calendarInterval(DateHistogramInterval.DAY)
-                        .format(DATE_FORMAT)
-                        .subAggregation(AggregationBuilders.sum(SUB_AGGREGATION).field(SUB_AGGREGATION_FIELD)))
+        // helper function to get the lastName counts from an Elasticsearch Aggregations
+        Function<Aggregations, Map<String, Double>> getTotalAmounts = getAggregationsMapFunction();
 
-                .withPageable(pageable)
-                .build();
+        // the parts of the returned object
+            Map<String, Double> totalAmounts = null;
+            List<SearchHit<Order>> searchHits = new ArrayList<>();
 
-        Aggregations aggregations = elasticsearchOperations.query(searchQuery, SearchResponse::getAggregations);
+            boolean fetchMore = true;
+            while (fetchMore) {
+                // call the custom method implementation
+                SearchPage<Order> searchPage = esOrderRepository.findTotalSumByDate(pageable);
 
-        Map<String, BigDecimal> incomes = new HashMap<>();
-        aggregations.forEach(zeroLevelAggregation -> {
-            if (DateHistogramAggregationBuilder.NAME.equals(zeroLevelAggregation.getType())) {
-                ParsedDateHistogram dateHistogram = aggregations.get(zeroLevelAggregation.getName());
-                dateHistogram.getBuckets().forEach(bucketLevelZero -> {
-                    String keyOfDateBucket = bucketLevelZero.getKeyAsString();
-                    bucketLevelZero.getAggregations().forEach(firstLevelAggregation -> {
-                        if (firstLevelAggregation.getType().equals(SumAggregationBuilder.NAME)) {
-                            ParsedSum sum = bucketLevelZero.getAggregations().get(firstLevelAggregation.getName());
-                            incomes.put(keyOfDateBucket, BigDecimal.valueOf(sum.getValue()));
-                        }
-                    });
-                });
+                // get the aggregations on the first call, will be the same on the other pages
+                if (totalAmounts == null) {
+                    Aggregations aggregations = searchPage.getSearchHits().getAggregations();
+                    totalAmounts = getTotalAmounts.apply(aggregations);
+                }
+
+                // collect the returned data
+                if (searchPage.hasContent()) {
+                    searchHits.addAll(searchPage.getContent());
+                }
+
+                pageable = searchPage.nextPageable();
+                fetchMore = searchPage.hasNext();
             }
-        });*/
 
-        SearchResponse response = null;
-        try {
-            response = elasticsearchClient.search(new SearchRequest("order")
-                    .source(new SearchSourceBuilder()
-                            //.query(query)
-                            .aggregation(
-                                    AggregationBuilders.terms(DATE_HISTOGRAM).field(DATE_HISTOGRAM_FIELD)
-                                            .subAggregation(AggregationBuilders.dateHistogram(SUB_AGGREGATION)
-                                                    .field(SUB_AGGREGATION_FIELD)
-                                                    //.fixedInterval(DateHistogramInterval.days(3652))
-                                                    //.extendedBounds(new ExtendedBounds(1940L, 2009L))
-                                                    .format(DATE_FORMAT)
-                                                    .subAggregation(AggregationBuilders.avg("avg_children").field("children"))
-                                            )
-                            )
-                            .from(pageable.getPageNumber()*pageable.getPageSize()) //FIXME
-                            .size(pageable.getPageSize())
-                            .trackTotalHits(true)
-                    ), RequestOptions.DEFAULT);
-            LOG.debug("elasticsearch response: {} hits", response.getHits().getTotalHits());
-            LOG.trace("elasticsearch response: {} hits", response.toString());
-        } catch (IOException e) {
-            LOG.error("Error during ES search", e);
-        }
+            // return the collected stuff
+            //Pair.of(searchHits, lastNameCounts)
 
+            return totalAmounts;
 
+    }
 
-        Map<String, BigDecimal> incomes = new HashMap<>();
-        return incomes;
+    private Function<Aggregations, Map<String, Double>> getAggregationsMapFunction() {
+        return aggregations -> {
+            Map<String, Double> incomeByDate = new HashMap<>();
+
+            if (aggregations != null) {
+                Aggregation aggregationByDates = aggregations.get(DATE_HISTOGRAM);
+                if (aggregationByDates != null) {
+                    List<? extends Histogram.Bucket> buckets = ((ParsedDateHistogram) aggregationByDates).getBuckets();
+                    if (buckets != null) {
+                        buckets.stream().forEach(bucket -> {
+                            Aggregations sumAggregations = bucket.getAggregations();
+                            ParsedSum sumAggregation = sumAggregations.get(SUB_AGGREGATION);
+
+                            incomeByDate.put(bucket.getKeyAsString(), sumAggregation.getValue());
+                        });
+                    }
+                }
+            }
+            return incomeByDate;
+        };
     }
 
 }

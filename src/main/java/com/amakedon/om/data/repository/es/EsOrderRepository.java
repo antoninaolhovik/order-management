@@ -7,7 +7,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EsOrderRepository extends ElasticsearchRepository<Order, Long> {
+public interface EsOrderRepository extends ElasticsearchRepository<Order, Long>, EsOrderCustomRepository {
 
     Page<Order> findByOrderItemsProductName(String name, Pageable pageable);
 
