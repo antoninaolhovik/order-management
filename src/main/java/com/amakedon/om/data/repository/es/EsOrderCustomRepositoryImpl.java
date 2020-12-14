@@ -6,6 +6,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHitSupport;
@@ -18,6 +19,7 @@ public class EsOrderCustomRepositoryImpl implements EsOrderCustomRepository {
 
     private final ElasticsearchOperations operations;
 
+    @Autowired
     public EsOrderCustomRepositoryImpl(ElasticsearchOperations operations) {
         this.operations = operations;
     }
@@ -35,15 +37,15 @@ public class EsOrderCustomRepositoryImpl implements EsOrderCustomRepository {
                 .field("createdDate")
                 .calendarInterval(DateHistogramInterval.DAY)
                 .subAggregation(sumAggregationBuilder);
-        Query query = new NativeSearchQueryBuilder()                       // we build a Elasticsearch native query
-                .addAggregation(datesAggregationBuilder) // add the aggregation
-                .withQuery(QueryBuilders.matchAllQuery())   // add the query part
-                .withPageable(pageable)                                        // add the requested page
+        Query query = new NativeSearchQueryBuilder()
+                .addAggregation(datesAggregationBuilder)
+                .withQuery(QueryBuilders.matchAllQuery())
+                .withPageable(pageable)
                 .build();
 
-        SearchHits<Order> searchHits = operations.search(query, Order.class);  // send it of and get the result
+        SearchHits<Order> searchHits = operations.search(query, Order.class);
 
-        return SearchHitSupport.searchPageFor(searchHits, pageable);  // convert the result to a SearchPage
+        return SearchHitSupport.searchPageFor(searchHits, pageable);
     }
 
 }

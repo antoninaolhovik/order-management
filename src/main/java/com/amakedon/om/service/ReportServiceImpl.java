@@ -11,11 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchPage;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,37 +39,13 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Map<String, Double> getAmountOfIncomeByDate(Pageable pageable) {
 
-        // helper function to get the lastName counts from an Elasticsearch Aggregations
         Function<Aggregations, Map<String, Double>> getTotalAmounts = getAggregationsMapFunction();
 
-        // the parts of the returned object
-            Map<String, Double> totalAmounts = null;
-            List<SearchHit<Order>> searchHits = new ArrayList<>();
+        SearchPage<Order> searchPage = esOrderRepository.findTotalSumByDate(pageable);
+        Aggregations aggregations = searchPage.getSearchHits().getAggregations();
+        Map<String, Double> totalAmounts = getTotalAmounts.apply(aggregations);
 
-            boolean fetchMore = true;
-            while (fetchMore) {
-                // call the custom method implementation
-                SearchPage<Order> searchPage = esOrderRepository.findTotalSumByDate(pageable);
-
-                // get the aggregations on the first call, will be the same on the other pages
-                if (totalAmounts == null) {
-                    Aggregations aggregations = searchPage.getSearchHits().getAggregations();
-                    totalAmounts = getTotalAmounts.apply(aggregations);
-                }
-
-                // collect the returned data
-                if (searchPage.hasContent()) {
-                    searchHits.addAll(searchPage.getContent());
-                }
-
-                pageable = searchPage.nextPageable();
-                fetchMore = searchPage.hasNext();
-            }
-
-            // return the collected stuff
-            //Pair.of(searchHits, lastNameCounts)
-
-            return totalAmounts;
+        return totalAmounts;
 
     }
 

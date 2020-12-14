@@ -29,9 +29,8 @@ public class ReportController {
                                          @RequestParam("size") Optional<Integer> size) {
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(5);
-        // request pages of size 1000
-        Pageable pageable = PageRequest.of(0, 1000);
 
+        Pageable pageable = PageRequest.of(currentPage, pageSize);
         return reportService.getAmountOfIncomeByDate(pageable);
     }
 
